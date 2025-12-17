@@ -25,7 +25,7 @@ class Product {
       price: (data['price'] ?? 0).toDouble(),
       rating: (data['rating'] ?? 0).toDouble(),
       image: data['image'] ?? 'https://via.placeholder.com/150',
-      images: List<String>.from(data['images'] ?? []),
+      images: List<String>.from(data['image-details'] ?? []),
       description: data['description'] ?? '',
     );
   }

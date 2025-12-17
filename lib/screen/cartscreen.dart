@@ -9,8 +9,21 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Test asdasdasd'),
+    return SafeArea(
+      child: Scaffold(
+        body: ListView.builder(
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundImage: AssetImage('assets/plant${index+1}.jpg'),
+              ),
+              title: Text('Plant Item ${index+1}'),
+              subtitle: Text('Quantity: 1'),
+              trailing: Text('\$${(index + 1) * 10}'),
+            );
+          }
+          ),
+        ) 
     );
   }
 }
