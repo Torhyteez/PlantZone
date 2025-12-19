@@ -14,7 +14,6 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  // CartProvider cartProvider = CartProvider(); // Xóa dòng này
   List<Image> images = [
     Image.asset('images/leaf.png'),
     Image.asset('images/briefcase.png'),
