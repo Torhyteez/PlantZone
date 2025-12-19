@@ -214,7 +214,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 },
                 child: Text(
                   'Thêm vào giỏ hàng',
-                  
                   ),
               ),
             ),

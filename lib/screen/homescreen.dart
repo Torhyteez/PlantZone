@@ -14,7 +14,6 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  // CartProvider cartProvider = CartProvider(); // Xóa dòng này
   List<Image> images = [
     Image.asset('images/leaf.png'),
     Image.asset('images/briefcase.png'),
@@ -23,7 +22,7 @@ class _HomescreenState extends State<Homescreen> {
   ];
   List<String> names = ['Tất cả', 'Cây văn phòng', 'Sen đá', 'Xương rồng'];
   // Danh sách chứa sản phẩm sẽ hiển thị
-  List<Product> _products = [];
+  final List<Product> _products = [];
   bool _isLoading = false;
   // Biến kiểm tra xem còn dữ liệu để tải không
   bool _hasMore = true;
@@ -80,7 +79,7 @@ class _HomescreenState extends State<Homescreen> {
       });
     }
   }
-
+  
   @override
   void initState() {
     super.initState();
@@ -93,6 +92,7 @@ class _HomescreenState extends State<Homescreen> {
     });
   }
 
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
