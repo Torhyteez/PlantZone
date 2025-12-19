@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plantzone/providers/bottom-provider.dart';
+import 'package:plantzone/providers/cart-provider.dart';
 import 'package:plantzone/screen/cartscreen.dart';
 import 'package:plantzone/screen/homescreen.dart';
 import 'package:plantzone/screen/profilescreen.dart';
@@ -17,10 +18,33 @@ class _MainScreenState extends State<MainScreen> {
     CartScreen(),
     ProfileScreen()
   ];
+
+  Widget _buildCartIcon(int count) {
+    return Stack(
+      children: [
+        Icon(Icons.shopping_cart),
+        if (count > 0)
+          Positioned(
+            right: -3,
+            top: -5,
+            child: Text(
+              '$count',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Lấy giá trị index từ provider
     final selectedIndex = context.watch<BottomNavProvider>().currentIndex;
+    final cartProvider = context.watch<CartProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -58,18 +82,19 @@ class _MainScreenState extends State<MainScreen> {
         children: _screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-          items: const [
+          items: [
             BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Home'
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
-                label: 'Cart'
+                icon: _buildCartIcon(cartProvider.totalItems),
+                label: 'Cart',
+                
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.account_circle),
-                label: 'Profile'
+                icon: Icon(Icons.account_circle, ),
+                label: 'Profile',
             )
           ],
         currentIndex: selectedIndex,

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:plantzone/model/products.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:intl/intl.dart';
+import 'package:plantzone/providers/cart-provider.dart';
+import 'package:provider/provider.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Product product;
@@ -81,7 +84,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  '${widget.product.price}đ',
+                  '${NumberFormat('#,##0').format(widget.product.price)}đ',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
@@ -200,6 +203,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   // Xử lý thêm vào giỏ hàng
+                  context.read<CartProvider>().addToCart(widget.product);
+                  // Hiển thị thông báo
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Đã thêm vào giỏ hàng'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 },
                 child: Text(
                   'Thêm vào giỏ hàng',
