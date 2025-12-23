@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plantzone/providers/cart-provider.dart';
 import 'package:provider/provider.dart';
-import 'package:quantity_input/quantity_input.dart';
 import 'package:plantzone/model/cart_item.dart';
 import 'package:intl/intl.dart';
 
@@ -14,7 +13,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final ScrollController _scrollController = ScrollController();
-  List<CartItem> _displayedItems = [];
+  final List<CartItem> _displayedItems = [];
   int _currentPage = 0;
   final int _itemsPerPage = 10;
 
