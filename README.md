@@ -28,7 +28,8 @@ Dự án này sử dụng Firebase. Vì lý do bảo mật, các file cấu hìn
 1. **Clone dự án:**
    ```bash
    git clone https://github.com/Torhyteez/PlantZone
-   cd [TEN_THU_MUC]
+   cd PlaneZone
+   
 2. **Cài đặt thư viện**
     flutter pub get
 3. Cấu hình firebase
