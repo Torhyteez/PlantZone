@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:plantzone/model/products.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
-import 'package:plantzone/providers/cart-provider.dart';
-import 'package:provider/provider.dart';
+import 'package:plantzone/model/products.dart';
+import '../model/cart_service.dart';
+import '../model/cart_model.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Product product;
@@ -15,210 +15,224 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
+  // Khởi tạo Service
+  final CartService _cartService = CartService();
+  bool _isAddingToCart = false;
+
   @override
   Widget build(BuildContext context) {
-    final List<String> imageUrls = widget.product.images;
+    // Lấy danh sách ảnh, nếu null hoặc rỗng thì dùng ảnh đại diện chính
+    final List<String> imageUrls = (widget.product.images.isNotEmpty)
+        ? widget.product.images
+        : [widget.product.image];
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CarouselSlider.builder(
-            itemCount: imageUrls.length,
-            itemBuilder: (context, index, realIndex) {
-              final url = imageUrls[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    errorBuilder: (ctx, error, stackTrace) {
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SafeArea(
+              child: Stack(
+                children: [
+                  CarouselSlider.builder(
+                    itemCount: imageUrls.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final url = imageUrls[index];
                       return Container(
-                        color: Colors.grey[300],
-                        child: const Center(
-                          child: Text(
-                            'Không thể tải ảnh',
-                            style: TextStyle(color: Colors.red),
+                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.network(
+                            url,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            errorBuilder: (ctx, error, stackTrace) => Container(
+                              color: Colors.grey[200],
+                              child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                            ),
                           ),
                         ),
                       );
                     },
+                    options: CarouselOptions(
+                      height: 350,
+                      viewportFraction: 0.9,
+                      enlargeCenterPage: true,
+                      enableInfiniteScroll: imageUrls.length > 1,
+                    ),
                   ),
-                ),
-              );
-            },
-            options: CarouselOptions(
-              height: 300,
-              viewportFraction: 0.85, // Hiển thị 85% của khung hình
-              enlargeCenterPage: true, // Phóng to trang hiện tại
-              enlargeFactor: 0.2, // Tỷ lệ phóng to
-              scrollDirection: Axis.horizontal,
-              pageSnapping: true, // Tự động dừng ở trang gần nhất
-              enableInfiniteScroll: true, // Vòng lặp vô hạn
+                  // Nút back
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back, color: Colors.black),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          // Tên và giá
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  '${widget.product.name}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                ),
-              ),
-              Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  '${NumberFormat('#,##0').format(widget.product.price)}đ',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
 
-          // Đánh giá
-          Row(
-            children: [
-              RatingBarIndicator(
-                rating: widget.product.rating,
-                itemBuilder: (context, index) =>
-                    Icon(Icons.star, color: Colors.amber),
-                itemSize: 30,
+            SizedBox(height: 20),
+
+            // Tên và giá
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.product.name,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    '${NumberFormat('#,##0').format(widget.product.price)}đ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: 8),
-              Text('(${widget.product.rating})'),
-            ],
-          ),
-          // Mô tả
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('Mô tả', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('${widget.product.description}', maxLines: 3),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Kích thước',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          ),
-          // Kích thước lựa chọn
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(left: 8, right: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(20),
+
+            // Đánh giá
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Row(
+                children: [
+                  RatingBarIndicator(
+                    rating: widget.product.rating,
+                    itemBuilder: (context, index) => Icon(Icons.star, color: Colors.amber),
+                    itemSize: 20,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('50 cm', textAlign: TextAlign.center),
+                  SizedBox(width: 8),
+                  Text(
+                    '(${widget.product.rating})',
+                    style: TextStyle(color: Colors.grey[600]),
                   ),
-                ),
+                ],
               ),
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(left: 8, right: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('70 cm', textAlign: TextAlign.center),
-                  ),
-                ),
+            ),
+
+            Divider(thickness: 1, indent: 16, endIndent: 16),
+
+            // Mô tả
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text('Mô tả', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                widget.product.description,
+                style: TextStyle(color: Colors.grey[700], height: 1.5),
               ),
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(left: 8, right: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('100 cm', textAlign: TextAlign.center),
-                  ),
-                ),
+            ),
+
+            SizedBox(height: 16),
+
+            // Kích thước
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text('Kích thước', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ),
+            SizedBox(height: 8),
+
+            // Phần chọn kích thước
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: ['50 cm', '70 cm', '100 cm', 'Khác'].map((size) {
+                  return Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(right: 8),
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.green),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(size, textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
+                    ),
+                  );
+                }).toList(),
               ),
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(left: 8, right: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('Khác', textAlign: TextAlign.center),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+
+            // Khoảng trống dưới cùng để không bị nút che mất nội dung
+            SizedBox(height: 80),
+          ],
+        ),
       ),
-      bottomNavigationBar: Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -5))],
+        ),
+        child: Row(
+          children: [
+            Expanded(
               child: ElevatedButton(
                 onPressed: () {
                   // Xử lý mua ngay
                 },
-                child: Text(
-                  'Mua ngay',
-                  style: TextStyle(color: Colors.red),
-                  ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.red),
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text('Mua ngay', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            SizedBox(width: 16),
+            Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  // Xử lý thêm vào giỏ hàng
-                  context.read<CartProvider>().addToCart(widget.product);
-                  // Hiển thị thông báo
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Đã thêm vào giỏ hàng'),
-                      duration: Duration(seconds: 2),
-                    ),
+                onPressed: _isAddingToCart ? null : () async {
+                  setState(() => _isAddingToCart = true);
+
+                  CartModel newItem = CartModel(
+                    productId: widget.product.id,
+                    name: widget.product.name,
+                    image: widget.product.image,
+                    price: widget.product.price,
+                    quantity: 1,
                   );
+
+                  await _cartService.addToCart(newItem);
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Đã thêm vào giỏ hàng thành công!'), backgroundColor: Colors.green),
+                    );
+                    setState(() => _isAddingToCart = false);
+                  }
                 },
-                child: Text(
-                  'Thêm vào giỏ hàng',
-                  ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: _isAddingToCart
+                    ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : Text('Thêm vào giỏ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

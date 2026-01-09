@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:plantzone/providers/bottom-provider.dart';
 import 'package:plantzone/providers/cart-provider.dart';
 import 'package:plantzone/screen/loginscreen.dart';
-import 'package:plantzone/screen/mainscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:plantzone/screen/mainscreen.dart';
+import 'package:plantzone/shared%20preferences/user_shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 Future<void> main() async {
@@ -11,6 +12,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Khởi tạo init()
+  await UserPrefs.init();
   runApp(
     MultiProvider(
         providers: [
@@ -27,9 +30,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = UserPrefs.getUser();
+    final bool isLoginIn = user != null;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen(),
+      home: isLoginIn ? const MainScreen() : const LoginScreen(),
     );
   }
 }

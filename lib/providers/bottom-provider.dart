@@ -5,7 +5,6 @@ class BottomNavProvider extends ChangeNotifier {
 
   int get currentIndex => _currentIndex;
 
-  // Hàm cập nhật giá trị index
   void updateIndex(int newIndex) {
     _currentIndex = newIndex;
     notifyListeners();

@@ -16,7 +16,7 @@ class Product {
   required this.image,
   required this.images,
   required this.description});
-
+  // Chuyển từ Firestore Document sang Object
   factory Product.fromSnapshot(DocumentSnapshot snapshot){
     final data = snapshot.data() as Map<String, dynamic>;
     return Product(

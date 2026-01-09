@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:plantzone/model/cart_service.dart';
 import 'package:plantzone/model/products.dart';
-import 'package:plantzone/providers/cart-provider.dart';
 import 'package:plantzone/screen/details-products-screen.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
+import '../model/cart_model.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -79,7 +80,7 @@ class _HomescreenState extends State<Homescreen> {
       });
     }
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -283,34 +284,34 @@ class _HomescreenState extends State<Homescreen> {
                                           SizedBox(height: 5),
                                           Row(
                                             children: [
-                                              // Chỉnh định dạng tiền là việt nam 
+                                              // Chỉnh định dạng tiền là việt nam
                                               Text(
                                                 '${NumberFormat('#,##0').format(product.price)} đ',
                                                 style: TextStyle(
                                                   color: Colors.green,
-
                                                 ),
                                               ),
                                               Spacer(),
 
+                                              // Ví dụ nút bấm
                                               IconButton(
-                                                onPressed: () {
-                                                  // Thêm sản phẩm vào giỏ hàng
-                                                  context
-                                                      .read<CartProvider>()
-                                                      .addToCart(product);
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text('Đã thêm vào giỏ hàng'),
-                                                      duration: Duration(seconds: 2),
-                                                    ),
-                                                  );
-                                                
-                                                },
-                                                icon: Icon(
-                                                  Icons.add_shopping_cart,
-                                                ),
-                                              ),
+                                                  onPressed: () async {
+                                                    CartModel newItem = CartModel(
+                                                        productId: product.id,
+                                                        name: product.name,
+                                                        image: product.image,
+                                                        price: product.price,
+                                                        quantity: 1
+                                                    );
+                                                    await CartService().addToCart(newItem);
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text('Đã thêm vào giỏ hàng thành công!'), backgroundColor: Colors.green)
+                                                      );
+                                                    }
+                                                  }, 
+                                                  icon: Icon(Icons.add_shopping_cart)
+                                              )
                                             ],
                                           ),
                                         ],
