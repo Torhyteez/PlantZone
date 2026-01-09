@@ -16,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     Homescreen(),
     CartScreen(),
-    ProfileScreen()
+    Container(),
   ];
 
   Widget _buildCartIcon(int count) {
@@ -99,7 +99,14 @@ class _MainScreenState extends State<MainScreen> {
           ],
         currentIndex: selectedIndex,
         onTap: (index) {
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfileScreen()),
+            );
+          } else {
             context.read<BottomNavProvider>().updateIndex(index);
+          }
         },
       ),
     );

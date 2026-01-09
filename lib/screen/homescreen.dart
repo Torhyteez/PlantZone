@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:plantzone/components/toast.dart';
 import 'package:plantzone/model/cart_service.dart';
 import 'package:plantzone/model/products.dart';
 import 'package:plantzone/screen/details-products-screen.dart';
@@ -91,6 +92,7 @@ class _HomescreenState extends State<Homescreen> {
         _getProducts();
       }
     });
+    ToastUtil.init(context);
   }
 
   @override
@@ -271,7 +273,7 @@ class _HomescreenState extends State<Homescreen> {
                                                 SizedBox(width: 4),
 
                                                 Text(
-                                                  '${product.rating} đ',
+                                                  '${product.rating}',
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
@@ -305,9 +307,7 @@ class _HomescreenState extends State<Homescreen> {
                                                     );
                                                     await CartService().addToCart(newItem);
                                                     if (context.mounted) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text('Đã thêm vào giỏ hàng thành công!'), backgroundColor: Colors.green)
-                                                      );
+                                                      ToastUtil.showToast(context);
                                                     }
                                                   }, 
                                                   icon: Icon(Icons.add_shopping_cart)

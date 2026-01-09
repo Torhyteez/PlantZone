@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plantzone/screen/checkout.dart';
 import '../model/cart_model.dart';
 import '../model/cart_service.dart';
 
@@ -206,6 +207,7 @@ class _CartScreenState extends State<CartScreen> {
             child: ElevatedButton(
               onPressed: () {
                 // Xử lý thanh toán
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CheckOutScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,

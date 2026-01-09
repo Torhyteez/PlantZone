@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
+import 'package:plantzone/components/toast.dart';
 import 'package:plantzone/model/products.dart';
+import 'package:plantzone/screen/checkout.dart';
 import '../model/cart_service.dart';
 import '../model/cart_model.dart';
 
@@ -19,6 +21,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
   final CartService _cartService = CartService();
   bool _isAddingToCart = false;
 
+
+  @override
+  void initState() {
+    super.initState();
+    ToastUtil.init(context);
+
+  }
   @override
   Widget build(BuildContext context) {
     // Lấy danh sách ảnh, nếu null hoặc rỗng thì dùng ảnh đại diện chính
@@ -190,6 +199,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   // Xử lý mua ngay
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => CheckOutScreen()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -216,9 +226,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   await _cartService.addToCart(newItem);
 
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Đã thêm vào giỏ hàng thành công!'), backgroundColor: Colors.green),
-                    );
+                    ToastUtil.showToast(context);
                     setState(() => _isAddingToCart = false);
                   }
                 },
